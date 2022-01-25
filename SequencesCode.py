@@ -27,7 +27,7 @@ def longest_common_subsequence(text1, text2):
         else:
             j -= 1
 
-    return ''.join(reversed(output))
+    return output[::-1]
 
 def shortest_common_supersequence(str1, str2):
     output, i, j = '', 0, 0
@@ -43,5 +43,6 @@ def shortest_common_supersequence(str1, str2):
         j += 1
 
     return output + str1[i:] + str2[j:]
+
 
 
