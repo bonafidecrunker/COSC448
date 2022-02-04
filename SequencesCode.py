@@ -29,6 +29,7 @@ def longest_common_subsequence(text1, text2):
 
     return output[::-1]
 
+
 def shortest_common_supersequence(str1, str2):
     output, i, j = '', 0, 0
     for c in longest_common_subsequence(str1, str2):

@@ -1,4 +1,4 @@
-# First Lesson
+# Day One
 def pattern_count(pattern, text):
     count = 0
     for i in range(len(text) - len(pattern) + 1):
@@ -47,7 +47,7 @@ def pattern_matching(pattern, genome):
     return [i for i in range(gen_length - pat_length + 1) if genome[i: i + pat_length] == pattern]
 
 
-# Second Lesson
+# Day Two
 def symbol_array(genome, symbol):
     array = {}
     n = len(genome)
@@ -85,15 +85,15 @@ def minimum_skew(genome):
 
 
 def hamming_distance(p, q):
+    # Python way to do this operation
+    return sum(1 for i, j in zip(p, q) if i != j)
+
     # Java like way to do this operation
     # hamming = 0
     # for i in range(len(p)):
     #     if p[i] != q[i]:
     #         hamming += 1
     # return hamming
-
-    # Python way to do this operation
-    return sum(1 for i, j in zip(p, q) if i != j)
 
 
 # Just adapts pattern_matching method to account for the Hamming distance as an approximation
@@ -105,4 +105,95 @@ def approximate_pattern_matching(text, pattern, distance):
 
 def approximate_pattern_count(pattern, text, distance):
     return len(approximate_pattern_matching(pattern, text, distance))
+
+
+# Day Three
+def count(motifs):
+    count = {}
+    k = len(motifs[0])
+    for c in "ACGT":
+        count[c] = []
+        for i in range(k):
+            count[c].append(0)
+    l = len(motifs)
+    for i in range(l):
+        for j in range(k):
+            c = motifs[i][j]
+            count[c][j] += 1
+    return count
+
+
+def profile(motifs):
+    count = {}
+    k = len(motifs[0])
+    for c in "ACGT":
+        count[c] = []
+        for i in range(k):
+            count[c].append(0)
+    l = len(motifs)
+    for i in range(l):
+        for j in range(k):
+            c = motifs[i][j]
+            count[c][j] += 1 / l
+    return count
+
+
+def consensus(motifs):
+    k = len(motifs[0])
+    counts = count(motifs)
+    output = ''
+    for j in range(k):
+        m = 0
+        ch = ''
+        for c in "ACGT":
+            if counts[c][j] > m:
+                m = counts[c][j]
+                ch = c
+        output += ch
+    return output
+
+
+def score(motifs):
+    sum = 0
+    for i in range(len(motifs)):
+        sum += hamming_distance(motifs[i], consensus(motifs))
+    return sum
+
+
+def pr(text, profile):
+    p = 1
+    for i in range(len(text)):
+        p *= profile[text[i]][i]
+    return p
+
+
+def profile_most_probable_kmer(text, k, profile):
+    l = len(text)
+    probabilities = {}
+    out = []
+    for i in range(l - k + 1):
+        pattern = text[i: i + k]
+        p = pr(pattern, profile)
+        probabilities[pattern] = p
+    m = max(probabilities.values())
+    for key, value in probabilities.items():
+        if probabilities[key] == m:
+            out.append(key)
+    return out[0]
+
+
+def greedy_motif_search(dna, k, t):
+    best_motifs = []
+    for i in range(t):
+        best_motifs.append(dna[i][0: k])
+    n = len(dna[0])
+    for i in range(n - k + 1):
+        motifs = []
+        motifs.append(dna[0][i: i + k])
+        for j in range(1, t):
+            p = profile(motifs[0: j])
+            motifs.append(profile_most_probable_kmer(dna[j], k, p))
+        if score(motifs) < score(best_motifs):
+            best_motifs = motifs
+    return best_motifs
 
