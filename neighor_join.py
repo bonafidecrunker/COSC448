@@ -24,6 +24,7 @@ def q_matrix(dist):
 def min_index(q):
     n = len(q)
     min_val = sys.maxsize
+    min_idx = (None, None)
     for i in range(n):
         for j in range(i, n):
             if q[i][j] < min_val:
@@ -32,19 +33,20 @@ def min_index(q):
     return min_idx
 
 
-# distance between the two closest unpaired points in the distance matrix. These are connected in a new node with
-# calculated distances
 def pair_distance(dist, ab):
+    """ distance between the two closest unpaired points in the distance matrix. These are connected in a new node with
+    calculated distances """
+
     a, b = ab[0], ab[1]
     n = len(dist)
     delta_a = 0.5 * dist[a][b] + 1 / (2 * n - 4) * (np.sum(dist[a]) - np.sum(dist[b]))
     delta_b = dist[a][b] - delta_a
-
     return float(delta_a), float(delta_b)
 
 
-# create new distance matrix with the distance of all unpaired points to newly created node
 def dist_to_new_node(dist, min_idx):
+    """ create new distance matrix with the distance of all unpaired points to newly created node"""
+
     n = len(dist) - 1
     d = np.zeros((n, n))
     a, b = min_idx[0], min_idx[1]
@@ -70,7 +72,6 @@ def dist_to_new_node(dist, min_idx):
         d[0][m] = d[m][0] = 0.5 * (d[a][i] + d[b][i] - d[a][b])
         m += 1
 
-    print(d)
     return d
 
 
@@ -100,8 +101,10 @@ def build_graph(dist, names):
 
         # use calculated information to update graph structure
         new_node_name = names[min_idx[0]] + names[min_idx[1]]
+        print(new_node_name)
         g.add_node(new_node_name)
-        new_edges = [(min_idx[0], new_node_name, {'weight': pair_dist[0]}), (min_idx[1], new_node_name, {'weight':pair_dist[1]})]
+        new_edges = [(min_idx[0], new_node_name, {'weight': pair_dist[0]}), (min_idx[1], new_node_name, {'weight': pair_dist[1]})]
+        print(new_edges)
         g.add_edges_from(new_edges)
 
         # calculate the new distance matrix
@@ -117,9 +120,12 @@ def main():
                    [9, 10, 8, 0, 3],
                    [8, 9, 7, 3, 0]]
     g = build_graph(test_matrix, names=list('abcde'))
-    pos = graphviz_layout(g, prog='dot')
-    nx.draw(g, pos)
-    plt.show()
+    print(g.nodes)
+    # pos = graphviz_layout(g, prog='dot')
+    # nx.draw(g, pos)
+    # nx.draw(g)
+    # plt.show()
+    print(g)
 
 
 main()
